@@ -26,7 +26,7 @@
     <div id="chat-container">
         <h3 style="margin: 0 0 10px 0; color: #00e5ff; letter-spacing: 2px; font-size: 16px; border-bottom: 1px dashed rgba(0, 229, 255, 0.3); padding-bottom: 8px;">SYSTEM // JARVIS M1 // ONLINE</h3>
         <div id="box">
-            <div class="msg ai"><b>JARVIS M1:</b> Core protocols active. Persona: High Density. Ask me anything.</div>
+            <div class="msg ai"><b>JARVIS M1:</b> Systems online. Mode: High-Density Response. Ask me anything.</div>
         </div>
         <div id="input-area">
             <input type="text" id="user-msg" placeholder="Awaiting hardware command..." onkeypress="handleKey(event)" autocomplete="off">
@@ -45,22 +45,34 @@
             append(text, 'user', 'USER');
             userMsg.value = '';
 
-            const id = append("Processing query matrices...", 'ai', 'JARVIS M1');
+            const id = append("Querying logic matrices...", 'ai', 'JARVIS M1');
 
             try {
                 // Strict rules injected directly to guarantee my tone
-                const rules = "Respond with high information density. Use short sentences under 10 words. Use bold text anchors. Use punchy lists. Do not use conversational filler. Question: ";
+                const rules = "Respond using short sentences under 10 words. Use bold text anchors. Use punchy lists. Deliver high information density. Question: ";
                 
-                // Stable, instant endpoint
-                const url = `https://pollinations.ai{encodeURIComponent(rules + text)}?model=openai`;
+                // Stable Open-Source Server Endpoint via Hugging Face API pipelines
+                const url = "https://huggingface.co";
                 
-                const res = await fetch(url);
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ inputs: rules + text })
+                });
+
                 if (!res.ok) throw new Error();
-                const data = await res.text();
+                const json = await res.json();
                 
-                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${data.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}`;
+                // Extract text and clean out prompt leak data
+                let rawData = json[0].generated_text || "Error processing data string.";
+                let cleanData = rawData.replace(rules + text, "").trim();
+                
+                // Formats markdown stars into proper bold HTML elements
+                cleanData = cleanData.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${cleanData}`;
             } catch (err) {
-                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Uplink failed. Re-verify browser network configuration.`;
+                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Pipeline timeout. Please try sending your command again.`;
             }
         }
 
