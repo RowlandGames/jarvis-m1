@@ -36,50 +36,54 @@
 
     <script>
         const box = document.getElementById('box');
-        const userMsg = document.getElementById('user-msg');
+const userMsg = document.getElementById('user-msg');
 
-        async function send() {
-            const text = userMsg.value.trim();
-            if (!text) return;
+async function send() {
+    const text = userMsg.value.trim();
+    if (!text) return;
 
-            append(text, 'user', 'USER');
-            userMsg.value = '';
+    append(text, 'user', 'USER');
+    userMsg.value = '';
 
-            const id = append("Querying web matrices...", 'ai', 'JARVIS M1');
+    const id = append("Querying web matrices...", 'ai', 'JARVIS M1');
 
-            try {
-                // Strict rule injected to mimic my prompt structure exactly
-                const persona = "Respond using short sentences under 10 words. Use bold text anchors. Use punchy lists. Deliver high information density. Question: ";
-                
-                // Using a robust, unblocked CDN endpoint for global data access
-                const url = `https://pollinations.ai{encodeURIComponent(persona + text)}?model=searchgpt`;
-                
-                const res = await fetch(url);
-                let data = await res.text();
-                
-                // Formats markdown styling markers to web bold tags
-                data = data.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    try {
+        // Upgraded personality instruction to match my specific tone constraints
+        const contextRule = "Respond with high information density. Use short sentences under 10 words. Use bold text anchors. Use punchy lists. Do not use conversational filler. Question: ";
+        
+        // Swapped to a direct text endpoint with integrated searchgpt bypass features
+        const url = `https://pollinations.ai{encodeURIComponent(contextRule + text)}?json=false&model=searchgpt`;
+        
+        const res = await fetch(url);
+        
+        if (!res.ok) throw new Error("Server handshake dropped.");
+        
+        let data = await res.text();
+        
+        // Clean markdown bold notation converts to html elements
+        data = data.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
 
-                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${data}`;
-            } catch (err) {
-                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Network connectivity fault detected. Request aborted.`;
-            }
-        }
+        document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${data}`;
+    } catch (err) {
+        document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Connection failure. Retrying uplink protocols...`;
+    }
+}
 
-        function append(text, type, label) {
-            const div = document.createElement('div');
-            const id = 'm-' + Date.now();
-            div.id = id;
-            div.className = `msg ${type}`;
-            div.innerHTML = `<b>${label}:</b> ${text}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-            return id;
-        }
+function append(text, type, label) {
+    const div = document.createElement('div');
+    const id = 'm-' + Date.now();
+    div.id = id;
+    div.className = `msg ${type}`;
+    div.innerHTML = `<b>${label}:</b> ${text}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    return id;
+}
 
-        function handleKey(e) {
-            if (e.key === 'Enter') send();
-        }
+function handleKey(e) {
+    if (e.key === 'Enter') send();
+}
+
     </script>
 
 </body>
