@@ -26,7 +26,7 @@
     <div id="chat-container">
         <h3 style="margin: 0 0 10px 0; color: #00e5ff; letter-spacing: 2px; font-size: 16px; border-bottom: 1px dashed rgba(0, 229, 255, 0.3); padding-bottom: 8px;">SYSTEM // JARVIS M1 // ONLINE</h3>
         <div id="box">
-            <div class="msg ai"><b>JARVIS M1:</b> Core protocols initialized. Web search capabilities active. State your request.</div>
+            <div class="msg ai"><b>JARVIS M1:</b> Core protocols active. Persona: High Density. Ask me anything.</div>
         </div>
         <div id="input-area">
             <input type="text" id="user-msg" placeholder="Awaiting hardware command..." onkeypress="handleKey(event)" autocomplete="off">
@@ -36,54 +36,48 @@
 
     <script>
         const box = document.getElementById('box');
-const userMsg = document.getElementById('user-msg');
+        const userMsg = document.getElementById('user-msg');
 
-async function send() {
-    const text = userMsg.value.trim();
-    if (!text) return;
+        async function send() {
+            const text = userMsg.value.trim();
+            if (!text) return;
 
-    append(text, 'user', 'USER');
-    userMsg.value = '';
+            append(text, 'user', 'USER');
+            userMsg.value = '';
 
-    const id = append("Querying web matrices...", 'ai', 'JARVIS M1');
+            const id = append("Processing query matrices...", 'ai', 'JARVIS M1');
 
-    try {
-        // Upgraded personality instruction to match my specific tone constraints
-        const contextRule = "Respond with high information density. Use short sentences under 10 words. Use bold text anchors. Use punchy lists. Do not use conversational filler. Question: ";
-        
-        // Swapped to a direct text endpoint with integrated searchgpt bypass features
-        const url = `https://pollinations.ai{encodeURIComponent(contextRule + text)}?json=false&model=searchgpt`;
-        
-        const res = await fetch(url);
-        
-        if (!res.ok) throw new Error("Server handshake dropped.");
-        
-        let data = await res.text();
-        
-        // Clean markdown bold notation converts to html elements
-        data = data.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            try {
+                // Strict rules injected directly to guarantee my tone
+                const rules = "Respond with high information density. Use short sentences under 10 words. Use bold text anchors. Use punchy lists. Do not use conversational filler. Question: ";
+                
+                // Stable, instant endpoint
+                const url = `https://pollinations.ai{encodeURIComponent(rules + text)}?model=openai`;
+                
+                const res = await fetch(url);
+                if (!res.ok) throw new Error();
+                const data = await res.text();
+                
+                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${data.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}`;
+            } catch (err) {
+                document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Uplink failed. Re-verify browser network configuration.`;
+            }
+        }
 
-        document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> ${data}`;
-    } catch (err) {
-        document.getElementById(id).innerHTML = `<b>JARVIS M1:</b> Connection failure. Retrying uplink protocols...`;
-    }
-}
+        function append(text, type, label) {
+            const div = document.createElement('div');
+            const id = 'm-' + Date.now();
+            div.id = id;
+            div.className = `msg ${type}`;
+            div.innerHTML = `<b>${label}:</b> ${text}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return id;
+        }
 
-function append(text, type, label) {
-    const div = document.createElement('div');
-    const id = 'm-' + Date.now();
-    div.id = id;
-    div.className = `msg ${type}`;
-    div.innerHTML = `<b>${label}:</b> ${text}`;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-    return id;
-}
-
-function handleKey(e) {
-    if (e.key === 'Enter') send();
-}
-
+        function handleKey(e) {
+            if (e.key === 'Enter') send();
+        }
     </script>
 
 </body>
